@@ -249,6 +249,8 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+
 end
 
 -- ============================================================
@@ -512,6 +514,9 @@ do
     --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
     --   },
     -- },
+    defaults = {
+      file_ignore_patterns = { '^%.git/' },
+    },
     pickers = {
       find_files = { hidden = true },
       live_grep = { additional_args = { '--hidden' } },
