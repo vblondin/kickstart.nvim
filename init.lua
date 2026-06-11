@@ -366,6 +366,14 @@ do
       topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
       changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
     },
+    on_attach = function(bufnr)
+      local gs = require 'gitsigns'
+      local map = function(mode, l, r, desc) vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc }) end
+
+      map('n', ']h', gs.next_hunk, 'Next git [H]unk')
+      map('n', '[h', gs.prev_hunk, 'Prev git [H]unk')
+      map('n', '<leader>hp', gs.preview_hunk, 'Git [H]unk [P]review')
+    end,
   }
 
   -- Useful plugin to show you pending keybinds.
@@ -1008,7 +1016,20 @@ do
 end
 
 -- ============================================================
--- SECTION 9: OPTIONAL EXAMPLES / NEXT STEPS
+-- ============================================================
+-- SECTION 9: TERMINAL
+-- toggleterm.nvim setup
+-- ============================================================
+do
+  vim.pack.add { gh 'akinsho/toggleterm.nvim' }
+  require('toggleterm').setup {
+    open_mapping = [[<c-\>]],
+    direction = 'float',
+    float_opts = { border = 'rounded' },
+  }
+end
+
+-- SECTION 10: OPTIONAL EXAMPLES / NEXT STEPS
 -- kickstart.plugins.* examples
 -- ============================================================
 do
