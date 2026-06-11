@@ -205,6 +205,10 @@ do
 
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+  -- Cycle through buffers
+  vim.keymap.set('n', ']b', '<cmd>bnext<CR>', { desc = 'Next [B]uffer' })
+  vim.keymap.set('n', '[b', '<cmd>bprevious<CR>', { desc = 'Previous [B]uffer' })
+
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
   -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
   -- is not what someone will guess without a bit more experience.
@@ -439,6 +443,21 @@ do
   ---@diagnostic disable-next-line: duplicate-set-field
   statusline.section_location = function() return '%2l:%-2v' end
 
+  -- File explorer
+  require('mini.files').setup {
+    mappings = {
+      go_in      = 'l',
+      go_in_plus = '<Right>',
+      go_out     = 'h',
+      go_out_plus = '<Left>',
+    },
+    content = {
+      filter = function(entry) return entry.name ~= '.git' end,
+    },
+  }
+  vim.keymap.set('n', '<leader>e', function() MiniFiles.open() end, { desc = 'Open [E]xplorer (mini.files)' })
+  vim.keymap.set('n', '<leader>E', function() MiniFiles.open(vim.api.nvim_buf_get_name(0)) end, { desc = 'Open [E]xplorer at current file' })
+
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
 end
@@ -493,7 +512,10 @@ do
     --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
     --   },
     -- },
-    -- pickers = {}
+    pickers = {
+      find_files = { hidden = true },
+      live_grep = { additional_args = { '--hidden' } },
+    },
     extensions = {
       ['ui-select'] = { require('telescope.themes').get_dropdown() },
     },
@@ -690,6 +712,9 @@ do
     -- gopls = {},
     -- pyright = {},
     -- rust_analyzer = {},
+    terraformls = {},
+    ansiblels = {},
+    bashls = {},
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
     --    https://github.com/pmizio/typescript-tools.nvim
@@ -754,6 +779,15 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
+    'prettier',
+    'yamllint',
+    'terraform-ls',
+    'tflint',
+    'ansible-language-server',
+    'ansible-lint',
+    'bash-language-server',
+    'shfmt',
+    'shellcheck',
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -796,10 +830,32 @@ do
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      yaml = { 'prettier' },
+      terraform = { 'terraform_fmt' },
+      ['terraform-vars'] = { 'terraform_fmt' },
+      ['yaml.ansible'] = { 'prettier' },
+      sh = { 'shfmt' },
     },
   }
 
   vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+end
+
+-- ============================================================
+-- SECTION 6b: LINTING
+-- nvim-lint setup
+-- ============================================================
+do
+  vim.pack.add { gh 'mfussenegger/nvim-lint' }
+  require('lint').linters_by_ft = {
+    yaml = { 'yamllint' },
+    terraform = { 'tflint' },
+    ['yaml.ansible'] = { 'ansible-lint' },
+    sh = { 'shellcheck' },
+  }
+  vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
+    callback = function() require('lint').try_lint() end,
+  })
 end
 
 -- ============================================================
