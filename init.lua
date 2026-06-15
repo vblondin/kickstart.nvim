@@ -217,6 +217,21 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+  -- Universal comment toggle (works for all filetypes including terraform, .env, etc.)
+  vim.keymap.set('n', '<C-/>', 'gcc', { remap = true, desc = 'Toggle comment' })
+  vim.keymap.set('v', '<C-/>', 'gc', { remap = true, desc = 'Toggle comment' })
+  -- Some terminals send <C-_> instead of <C-/>
+  vim.keymap.set('n', '<C-_>', 'gcc', { remap = true, desc = 'Toggle comment' })
+  vim.keymap.set('v', '<C-_>', 'gc', { remap = true, desc = 'Toggle comment' })
+
+  -- Ensure .env files use # for comments
+  vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+    pattern = { '.env', '.env.*', '*.env' },
+    callback = function()
+      vim.bo.commentstring = '# %s'
+    end,
+  })
+
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
   -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
