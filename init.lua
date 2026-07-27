@@ -743,6 +743,7 @@ do
     terraformls = {},
     ansiblels = {},
     bashls = {},
+    helm_ls = {},
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
     --    https://github.com/pmizio/typescript-tools.nvim
@@ -809,6 +810,7 @@ do
     -- You can add other tools here that you want Mason to install
     'prettier',
     'yamllint',
+    'helm-ls',
     'terraform-ls',
     'tflint',
     'ansible-language-server',
